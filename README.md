@@ -60,7 +60,7 @@ date = 2000-01-01
 description = "Grocery shopping"
 payee = "My local grocery store"
 postings = [ # Changes to accounts
- {account = "Assets:BankName:Savings", amount=-45, currency = "GBP"}
+ {account = "Assets:BankName:Savings", amount=-45, currency = "GBP"},
  {account = "Expenses:Food:Groceries", amount=45, currency = "GBP"}
 ]
 logged = 2000-01-02 13:00:02Z # When the transaction was actually logged (in UTC +0)
