@@ -7,14 +7,9 @@ use crate::{files, APP_NAME};
 
 pub fn go(args: &mut Vec<String>)
 {
-	if args.len() == 1
-	{
-		println!("Ledgerr: {}", "No arguments provided for time".yellow());
-		return;
-	}
 	args.remove(0); // Remove the "time" from the args
 	crate::MatchCompletions!{
-		args[0].to_lowercase().as_str(),
+		args.first(),
 		"new", new(args), "Add a new time log",
 		"view", view(args), "View the current time logs"
 		//"total", save(args), "See the current time spent on each project"

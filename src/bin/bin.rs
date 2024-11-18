@@ -15,14 +15,35 @@ use commands::time;
 
 // TODO: Make this macro also build us a bash completions tree!
 //       And make it crawl the called functions!
-// TODO: Also make this able to print an (expected --a or --b)??
 #[macro_export]
+/// Handles matches and calls for an Option<Slice>
+/// Expects the Option<Slice> and then repeating `TO_MATCH` `FUNC_TO_CALL` "Description"
 macro_rules! MatchCompletions {
     ($to_match: expr, $($name:tt, $call:expr, $description:tt),+) => {
+    	let options = vec![ $( ($name, $description), )+ ];
         match $to_match
         {
-        	$( $name => $call, )+
-        	_ => println!("Ledgerr: {}{}{}", "Argument '".yellow(), $to_match, "' not recognised".yellow())
+        	Some(value) => { 
+        		match value.to_lowercase().as_str() {
+		        	$( $name => $call, )+
+		        	_ => {
+		        		println!("Ledgerr: {}{}{}", "Argument '".yellow(), value, "' not recognised".yellow());
+		        		println!("Valid options:");
+		        		for option in options
+		        		{
+		        			println!("\t{}\t{}", option.0.bold(), option.1);
+		        		}
+		        	}
+        		}
+        	}
+        	None => {
+        		println!("Ledgerr: {}", "No argument provided".yellow());
+        		println!("Valid options:");
+        		for option in options
+        		{
+        			println!("\t{}\t{}", option.0.bold(), option.1);
+        		}
+        	}
         }
     };
 }
@@ -40,14 +61,9 @@ fn main()
 	// https://doc.rust-lang.org/book/ch12-01-accepting-command-line-arguments.html
 	let mut args: Vec<String> = env::args().collect();
 
-	if args.len() == 1
-	{
-		println!("Ledgerr: {}", "No arguments provided".yellow());
-		return
-	}
 	args.remove(0); // Remove the executable
 	MatchCompletions!(
-		args[0].to_lowercase().as_str(),
+		args.first(),
 		"time", time::go(&mut args), "Ledgerr's time tracking module",
 		"money", money::main(&mut args), "Ledgerr's finance tracking module"	
 	);
