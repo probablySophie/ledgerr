@@ -5,8 +5,10 @@ A simple Rust based plain text Finance and Time tracking library.
 
 Inspired by the general [Plain Text Accounting](https://plaintextaccounting.org) movement, and specifically spurred into action by the blog post [You should track your finances in TOML](https://kmaasrud.com/blog/track-finances-in-toml.html).
 
-**You should not use this project**.  
-At this point Ledgerr is still heavily under construction.  It can only vaguely do timesheets and cannot do anything at all with finance.  
+
+> [!WARNING]
+> **You should not use this project**.  
+> *At this point Ledgerr is still heavily under construction.  It can only vaguely do timesheets and cannot do anything at all with finance.*  
 
 The goal is to eventually create a [Ratatui](https://ratatui.rs/) based TUI app using this library once it is feature complete.
 
