@@ -16,8 +16,11 @@ use commands::time;
 // TODO: Make this macro also build us a bash completions tree!
 //       And make it crawl the called functions!
 #[macro_export]
-/// Handles matches and calls for an Option<Slice>
-/// Expects the Option<Slice> and then repeating `TO_MATCH` `FUNC_TO_CALL` "Description"
+/// Handles matches and calls for an `Option<String>`
+/// Expects the Option<Slice> and then repeating:
+/// * `$name` - a lowercase `&str` that the unwrapped input will be matched against
+/// * `$call` - a function to call on match - can have args provided
+/// * `$description` - a string description of what the function is/does
 macro_rules! MatchCompletions {
     ($to_match: expr, $($name:tt, $call:expr, $description:tt),+) => {
     	let options = vec![ $( ($name, $description), )+ ];
@@ -61,7 +64,7 @@ fn main()
 	// https://doc.rust-lang.org/book/ch12-01-accepting-command-line-arguments.html
 	let mut args: Vec<String> = env::args().collect();
 
-	args.remove(0); // Remove the executable
+	args.remove(0); // Remove the executable from the args list
 	MatchCompletions!(
 		args.first(),
 		"time", time::go(&mut args), "Ledgerr's time tracking module",

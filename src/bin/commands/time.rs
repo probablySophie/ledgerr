@@ -1,7 +1,11 @@
 use colored::Colorize;
 use serde::{Deserialize, Serialize};
 
-#[path = "time_cmd_input.rs"] mod time_cmd_input;
+#[path = "time_cmd_input.rs"] 
+mod time_cmd_input;
+
+#[path = "time_view.rs"] 
+mod time_view;
 
 use crate::{files, APP_NAME};
 
@@ -10,25 +14,12 @@ pub fn go(args: &mut Vec<String>)
 	args.remove(0); // Remove the "time" from the args
 	crate::MatchCompletions!{
 		args.first(),
-		"new", new(args), "Add a new time log",
-		"view", view(args), "View the current time logs"
-		//"total", save(args), "See the current time spent on each project"
+		"new", new(), "Add a new time log",
+		"view", time_view::view(args), "View the current time logs"
 	};
 }
 
-fn read_line_into(string: &mut String) -> bool
-{
-	string.clear();
-	match std::io::stdin().read_line(string) {
-    	Ok(_)  => {
-    		*string = string.trim().to_string();
-    		true
-    	},// do whatever you want, line is String
-    	Err(_) => {false},// handle error, e is IoError
-	}
-}
-
-fn new(args: &mut Vec<String>)
+fn new()
 {
 	match time_cmd_input::prompt_all() {
 	    Ok(entry)  => {
@@ -52,31 +43,18 @@ fn new(args: &mut Vec<String>)
 struct EntryList {
 	time_log: Vec<ledgerr::timesheet::Entry>
 }
-fn view(args: &mut Vec<String>)
+
+pub fn load() -> Result< Vec<ledgerr::timesheet::Entry>, String >
 {
-	// let timesheet_result = files::load::<Vec<ledgerr::timesheet::Entry>>(files::Location::Data, APP_NAME, "timesheet.toml");
-	// let timesheet_result = files::load::<ledgerr::timesheet::Entry>(files::Location::Data, APP_NAME, "timesheet.toml");
-	let timesheet_result = files::load::<EntryList>(
+	match files::load::<EntryList>(
 		files::Location::Data, 
 		APP_NAME, 
 		"timesheet.toml",
 		Some(vec![("time-log", "time_log")])
-	);
-
-	if let Ok(timesheet) = timesheet_result
+	)
 	{
-		for entry in timesheet.time_log 
-		{
-			println!();
-			entry.pretty_print();
-		}
-	}
-	else if let Err(error) = timesheet_result
-	{
-		println!("Ledgerr: {}\n{}", "Failed to load timesheet".yellow(), error.red());
+		Ok (list)  => Ok(list.time_log),
+		Err(error) => Err(error),
 	}
 }
 
-
-// See 
-// TODO: fn total()

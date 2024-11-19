@@ -1,9 +1,9 @@
-
 // This heavily relies on the TOML crate
 // https://docs.rs/toml/latest/toml/index.html
 
 use std::io::Write;
 
+#[allow(unused)]
 #[derive(Clone, Copy)]
 pub enum Location
 {
@@ -31,7 +31,7 @@ fn get_path(location: Location, folder: &str, file_name: &str) -> Result<String,
 		return Err(String::from("Failed to get directory"));
 	};
 	// Try convert our path into a str
-	let Some(mut path) = pathbuf.to_str()
+	let Some(path) = pathbuf.to_str()
 	else {
 		return Err(String::from("Failed to convert path to str"));
 	};
@@ -90,6 +90,7 @@ pub fn load<T: for<'de> toml::macros::Deserialize<'de>>
 		Ok(string) => string,
 		Err(error) => return Err(error.to_string()),	
 	};
+	// Make the replacements (if there are any)
 	make_replacements(&mut file_string, replacements);
 	
 	let err = toml::from_str::<T>(&file_string);
@@ -97,7 +98,6 @@ pub fn load<T: for<'de> toml::macros::Deserialize<'de>>
 	{
 		return Err(errr.to_string())
 	}
-	// TODO: If there are Option<Replacements>, make them
 	// Try convert the file string into TOML
 	let Ok(extracted) = toml::from_str::<T>(&file_string)
 	else {
@@ -107,6 +107,7 @@ pub fn load<T: for<'de> toml::macros::Deserialize<'de>>
 	Ok(extracted)
 }
 
+#[allow(unused)]
 pub enum SaveOption
 {
 	Replace,

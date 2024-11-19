@@ -65,12 +65,102 @@ impl Entry
 		if let Some(val) = self.task.clone() { println!("\tTask        | {val}") }
 		if let Some(val) = self.description.clone() { println!("\tDescription | {val}") }
 	}
+
+	#[must_use] pub fn minutes(&self) -> i32
+	{
+		crate::time_as_minutes(self.end) - crate::time_as_minutes(self.start)
+	}
 }
 
-// TODO: Get all clients from a Vec<Entry>
-// TODO: And testing for that
-// TODO: Get all projects from a Vec<Entry>
-// TODO: And testing for that
+fn already_there(string: &String, strings: &[String]) -> Option<usize>
+{
+	for (i, check) in strings.iter().enumerate()
+	{
+		if string == check
+		{
+			return Some(i)
+		}
+	}
+	// Not there
+	None
+}
+
+macro_rules! get_list_by_value {
+    ($entries: ident, $value:tt) => {
+        let mut results: Vec<String> = Vec::new();
+        
+		for entry in $entries
+		{
+			if already_there(&entry.$value, &results).is_none() {
+				results.push( entry.$value.clone() )
+			}
+		}		
+        return results
+    };
+}
+
+// TODO: Parallellise all of these?
+// TODO: Testing for get_clients
+#[must_use]
+pub fn get_clients(entries: &[Entry]) -> Vec<String>
+{
+	get_list_by_value!{entries, client}
+}
+
+// TODO: Testing for get_projects
+#[must_use]
+pub fn get_projects(entries: &[Entry]) -> Vec<String>
+{
+	get_list_by_value!{entries, project}
+}
+
+fn in_time_list(identifier: &String, list: &[(String, i32)]) -> Option<usize>
+{
+	for (i, item) in list.iter().enumerate()
+	{
+		if item.0 == *identifier
+		{
+			return Some(i)
+		}
+	}
+	None
+}
+
+macro_rules! get_time_by {
+    ($entries:ident, $value:tt) => {
+        let mut results: Vec<(String, i32)> = Vec::new();
+
+		for entry in $entries
+		{
+			match in_time_list( &entry.$value, &results)
+			{
+				Some(i) => 
+				{
+					results[i].1 += entry.minutes();
+				},
+				None => 
+				{
+					results.push( ( entry.$value.clone(), entry.minutes() ) );
+				}
+			}
+		}		
+
+        return results
+    };
+}
+
+/// Returns a list of projects & total minutes in the form `Vec<(String, i32)>`
+#[must_use] pub fn get_project_time(entries: &[Entry]) -> Vec<(String, i32)>
+{
+	get_time_by!{entries, project}
+}
+
+/// Returns a list of projects & total minutes in the form `Vec<(String, i32)>`
+#[must_use] pub fn get_client_time(entries: &[Entry]) -> Vec<(String, i32)>
+{
+	get_time_by!{entries, client}
+}
+
 // TODO: Get all tasks from a Vec<Entry>
 // TODO: And testing for that
 

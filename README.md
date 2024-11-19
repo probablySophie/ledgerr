@@ -8,7 +8,7 @@ Inspired by the general [Plain Text Accounting](https://plaintextaccounting.org)
 
 > [!WARNING]
 > **You should not use this project**.  
-> *At this point Ledgerr is still heavily under construction.  It can only vaguely do timesheets and cannot do anything at all with finance.*  
+> *At this point Ledgerr is still heavily under construction.  It can only vaguely do time-sheets and cannot do anything at all with finance.*  
 
 The goal is to eventually create a [Ratatui](https://ratatui.rs/) based TUI app using this library once it is feature complete.
 
@@ -18,6 +18,19 @@ The library comes with a simple Ledgerr binary `ledgerr_cmd` that is being used 
 
 Running the binary will no arguments (or an invalid argument) will provide a list of arguments and descriptions of what they do :)
 
+## Steps to completion:
+
+- [ ] `ledgerr:timesheet:Entry` filtering by `before:`, `after:`
+- [ ] New timesheet entries should default to today's date
+- [ ] Multi day entries (probably just break into multiple at midnight)
+- [ ] Finance.  All of it.
+- [ ] Tests, for everything.
+
+### Would be nice to do:
+
+- [ ] Cute little table print so that everything gets the same spacing no matter the lengths.
+- [ ] Build a bash completion function for `ledgerr_cmd`
+- [ ] Parallelise the `&[Entry]` and `&[Transaction]` filter & analysis functions
 
 ## Storage Formats
 

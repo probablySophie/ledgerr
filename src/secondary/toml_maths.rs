@@ -1,33 +1,35 @@
 
+#[must_use] pub fn time_as_seconds(time: toml::value::Time) -> i32
+{
+	(((i32::from(time.hour) * 60) + i32::from(time.minute) ) * 60 
+	) 
+		+ i32::from(time.second)
+}
+#[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
+#[must_use] pub fn time_from_seconds(seconds: i32) -> toml::value::Time
+{
+	toml::value::Time
+	{
+		hour: (seconds / 3600) as u8,
+		minute: ((seconds / 60 ) % 60) as u8,
+		second: (seconds % 60) as u8,
+		nanosecond: 0
+	}
+}
 
-fn sub_hour(time: &mut toml::value::Time, hours: u8)
+#[must_use] pub fn time_as_minutes(time: toml::value::Time) -> i32
 {
-	time.hour -= hours;
+	(i32::from(time.hour) * 60) + i32::from(time.minute)
 }
-fn sub_minute(time: &mut toml::value::Time, minutes: u8)
+#[allow(clippy::cast_sign_loss, clippy::cast_possible_truncation)]
+#[must_use] pub fn time_from_minutes(minutes: i32) -> toml::value::Time
 {
-	if minutes == 0 {return}
-	if i16::from(time.minute) - i16::from(minutes) < 0
+	toml::value::Time
 	{
-		sub_hour(time, 1);
-		time.minute = time.minute + 60 - minutes;
-	}
-	else
-	{
-		time.minute -= minutes;
-	}
-}
-fn sub_second(time: &mut toml::value::Time, seconds: u8)
-{
-	if seconds == 0 {return}
-	if i16::from(time.second) - i16::from(seconds) < 0
-	{
-		sub_minute(time, 1);
-		time.second = time.second + 60 - seconds;
-	}
-	else
-	{
-		time.second -= seconds;
+		hour: (minutes / 60) as u8,
+		minute: (minutes % 60) as u8,
+		second: 0,
+		nanosecond: 0
 	}
 }
 
@@ -41,11 +43,30 @@ pub fn time_sub(from: toml::value::Time, value: toml::value::Time) -> toml::valu
 		return return_time;
 	}
 	// Else
-	return_time = from;
-
-	sub_hour(&mut return_time, value.hour);
-	sub_minute(&mut return_time, value.minute);
-	sub_second(&mut return_time, value.second);
+	return_time = time_from_seconds( time_as_seconds(from) - time_as_seconds(value) );
 	
 	return_time // return return_time;
+}
+
+#[must_use]
+pub fn pretty_time_from_minutes(minutes: i32) -> String
+{
+	let mut string = String::new();
+	let hours = minutes / 60;
+	let minutes = minutes % 60;
+
+	if hours != 0
+	{
+		string += &(hours.to_string() + " hrs");
+	}
+	if hours != 0 && minutes != 0 
+	{
+		string += " ";
+	}
+	if minutes != 0
+	{
+		string += &(minutes.to_string() + " mins");
+	}
+
+	string
 }
