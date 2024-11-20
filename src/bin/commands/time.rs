@@ -29,7 +29,8 @@ fn new()
 	    		"timesheet.toml", 
 	    		EntryList { time_log: vec![entry] }, 
 	    		files::SaveOption::Append, 
-	    	Some(vec![("time_sheet", "time-sheet")]))	    	
+		    	None,//Some(vec![("time_sheet", "time-sheet")])
+		    )	    	
 		    {
 	    		Ok(_) => println!("Saved file!"),
 	    		Err(error) => println!("Error: {error}"),
@@ -40,6 +41,7 @@ fn new()
 }
 
 #[derive(Serialize, Deserialize)]
+#[serde(rename_all="kebab-case")]
 struct EntryList {
 	time_log: Vec<ledgerr::timesheet::Entry>
 }
@@ -50,7 +52,7 @@ pub fn load() -> Result< Vec<ledgerr::timesheet::Entry>, String >
 		files::Location::Data, 
 		APP_NAME, 
 		"timesheet.toml",
-		Some(vec![("time-log", "time_log")])
+		None,//Some(vec![("time-log", "time_log")])
 	)
 	{
 		Ok (list)  => Ok(list.time_log),
