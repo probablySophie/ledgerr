@@ -17,6 +17,7 @@ macro_rules! load_match {
     };
 }
 
+// TODO: Filter what we're viewing based on the args!
 pub fn view(args: &mut Vec<String>)
 {
 	args.remove(0); // Remove the "time" from the args
