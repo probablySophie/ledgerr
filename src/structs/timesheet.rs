@@ -1,3 +1,5 @@
+use std::iter::FilterMap;
+
 use serde::{Serialize, Deserialize};
 
 // Getting the current time
@@ -10,7 +12,7 @@ use serde::{Serialize, Deserialize};
 
 
 /// A single timesheet entry.
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Entry
 {
 	/// The date that this logged time period occurred on
@@ -32,19 +34,21 @@ pub struct Entry
 	pub utc_offset: Option<i8>
 }
 impl Default for Entry
-{
+{	
 	fn default() -> Self
 	{
-		// TODO: Make the date default to today
-		// TODO: Make both the times default to now
+		let datetime = crate::secondary::datetime_now();
+		let date = crate::secondary::date_from_option(datetime);
+		let time = crate::secondary::time_from_option(datetime);
+		
     	Self { 
-    		date: toml::value::Date { year: 2000, month: 1, day: 1 },
+    		date,
     		client: String::new(), 
     		project: String::new(), 
     		task: None,
     		description: None, 
-    		start: toml::value::Time { hour: 0, minute: 0, second: 0, nanosecond: 0 },
-    		end: toml::value::Time { hour: 0, minute: 0, second: 0, nanosecond: 0 },
+    		start: time,
+    		end: time,
     		utc_offset: None
     	}
 	}
@@ -85,6 +89,7 @@ fn already_there(string: &String, strings: &[String]) -> Option<usize>
 	None
 }
 
+// TODO: Parallellise all of these?
 macro_rules! get_list_by_value {
     ($entries: ident, $value:tt) => {
         let mut results: Vec<String> = Vec::new();
@@ -99,7 +104,6 @@ macro_rules! get_list_by_value {
     };
 }
 
-// TODO: Parallellise all of these?
 // TODO: Testing for get_clients
 #[must_use]
 pub fn get_clients(entries: &[Entry]) -> Vec<String>
@@ -126,6 +130,7 @@ fn in_time_list(identifier: &String, list: &[(String, i32)]) -> Option<usize>
 	None
 }
 
+// TODO: Parallellise?
 macro_rules! get_time_by {
     ($entries:ident, $value:tt) => {
         let mut results: Vec<(String, i32)> = Vec::new();
@@ -161,9 +166,28 @@ macro_rules! get_time_by {
 	get_time_by!{entries, client}
 }
 
+
+#[must_use]
+/// Creates a new `Vec<Entry>` based on the given filters
+fn filter(entries: &[Entry], before: Option<toml::value::Date>, after: Option<toml::value::Date>) -> Vec<Entry>
+{
+	let mut filtered = Vec::new();
+
+	let date_after = after.unwrap_or( toml::value::Date { year: 0, month: 0, day: 0 } );
+	let date_before = before.unwrap_or( toml::value::Date { year: u16::MAX, month: u8::MAX, day: u8::MAX } );
+
+	for entry in entries
+	{
+		if date_after < entry.date && entry.date < date_before
+		{
+			filtered.push ( (*entry).clone() );
+		}
+	}
+
+	filtered
+}
+
 // TODO: Get all tasks from a Vec<Entry>
 // TODO: And testing for that
-
-// TODO: Filtering & testing for the filtering
 
 // TODO: Multi-day entries? e.g. 8:00 pm Saturday -> 3:00 am Sunday
