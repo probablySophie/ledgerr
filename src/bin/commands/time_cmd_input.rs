@@ -17,12 +17,19 @@ pub fn prompt_all() -> Result<ledgerr::timesheet::Entry, String>
 
 	let mut new_entry = ledgerr::timesheet::Entry::default();
 	
-	println!("Date: ");
+	println!("Date [{}-{}-{}]: ", new_entry.date.year, new_entry.date.month, new_entry.date.day);
 	read_line_into(&mut input);
-	match ledgerr::date_from_string(&input)
+	if input.is_empty()
 	{
-	    Ok(date)   => new_entry.date = date,
-	    Err(error) => return Err(error),
+		// Use the default
+	}
+	else
+	{
+		match ledgerr::date_from_string(&input)
+		{
+		    Ok(date)   => new_entry.date = date,
+		    Err(error) => return Err(error),
+		}
 	}
 	
 	println!("Client: ");
