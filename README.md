@@ -22,6 +22,7 @@ Running the binary will no arguments (or an invalid argument) will provide a lis
 
 - [ ] `ledgerr:timesheet:Entry` filtering by `before:`, `after:`
 - [ ] New timesheet entries should default to today's date
+- [ ] Entry.sort()
 - [ ] Multi day entries (probably just break into multiple at midnight)
 - [ ] Finance.  All of it.
 - [ ] Tests, for everything.
