@@ -29,16 +29,88 @@ pub struct Transaction
 	/// Stored in UTC+0 and localised when shown to the user
 	logged: toml::value::Datetime,
 }
+impl Transaction
+{
+	#[must_use]
+	pub fn new(postings: Vec<Posting>, payee: String, description: String) -> Self
+	{
+		let datetime = crate::secondary::datetime_now().unwrap_or(
+			toml::value::Datetime {
+				date: Some(crate::secondary::default_date()),
+				time: Some(crate::secondary::default_time()),
+				offset: None,
+			}
+		);
+		Transaction
+		{
+			date: datetime.date.unwrap_or( crate::secondary::default_date() ),
+			description,
+			payee,
+			postings,
+			logged: datetime,
+		}
+	}
+}
 
-// TODO: Read from string
-// TODO: Write to string
-// TODO: Test - read & write back same
+fn insert_into_vec(posting: &Posting, vec: &mut Vec<(String, i32)>)
+{
+	for account in vec.iter_mut()
+	{
+		if account.0 == posting.account
+		{
+			account.1 += posting.amount;
+			return
+		}
+	}
+	// Else
+	vec.push( (posting.account.clone(), posting.amount) );
+}
 
-// TODO: Get all payees from list of Transactions
-// TODO: And testing for that
+// TODO: Parallellise
+// TODO: Testing for get_accounts
+#[must_use]
+/// Get a list of accounts and their balances in the form `Vec<(String, i32)>`
+pub fn get_accounts(transactions: &[Transaction]) -> Vec<(String, i32)>
+{
+	let mut accounts = Vec::new();
+	// For each transaction
+	for transaction in transactions
+	{
+		// For each posting in that transaction
+		for posting in &transaction.postings
+		{
+			// Either insert it into the vec or append it to the end
+			insert_into_vec(posting, &mut accounts);
+		}
+	}
+	accounts
+}
 
-// TODO: Get current balances of accounts by reading all inputs
-// TODO: And testing for that
+// TODO: Parallellise
+#[must_use]
+pub fn get_payees(transactions: &[Transaction]) -> Vec<String>
+{
+	let mut payees: Vec<String> = Vec::new();
+
+	for transaction in transactions
+	{
+		let mut found = false;
+		for payee in &payees
+		{
+			if transaction.payee == *payee
+			{
+				found = true;
+				break;
+			}
+		}
+		if !found 
+		{
+			payees.push(transaction.payee.clone());
+		}
+	}
+	payees
+}
+
 // TODO: Create starting balance for next month/year/whenever
 // TODO: And testing for that
 
