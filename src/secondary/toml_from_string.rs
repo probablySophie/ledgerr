@@ -17,7 +17,7 @@ fn split_please<'a>(string: &'a str, options: &[&'a str]) -> core::str::Split<'a
 /// * If unable to retrieve a year, month, or day
 /// * If unable to convert the year, month, or day to a u16 or u8
 pub fn date_from_string(string: &str) -> Result<toml::value::Date, String>
-{
+{	
 	let mut split = split_please(string, &["/", "-", "\\"]);
 	
 	let year = match split.next()
@@ -54,34 +54,60 @@ pub fn date_from_string(string: &str) -> Result<toml::value::Date, String>
 /// # Errors
 /// * If the string did not have any ':' values
 /// * If unable to convert from either of hour:minute to u8
-pub fn time_from_string(string: &str) -> Result<toml::value::Time, String>
+pub fn time_from_string(time_string: &str) -> Result<toml::value::Time, String>
 {
+	let mut string = time_string.to_lowercase();
+	
+	let mut hour_modifier = 0;
+	if string.contains("pm")
+	{
+		hour_modifier = 12;
+		string = string.replace("pm", "");
+	}
+	if string.contains("am")
+	{
+		string = string.replace("am", "");
+	}
+
+	// If there isn't a divider char
+	if ! string.contains(':')
+	{
+		// Assume they provided just an hour
+		let Ok(hour) = string.parse::<u8>()
+		else {
+			return Err(String::from("Failed to convert provided &str to time"));
+		};
+		return Ok( toml::value::Time { 
+			hour: hour + hour_modifier, 
+			minute: 0, 
+			second: 0, 
+			nanosecond: 0 
+		} )
+	}
+	// Else
 	let mut split = string.split(':');
 	// Hour
 	let Some(hour_str) = split.next()
 	else {
 		return Err(String::from("Failed to get hour"));
 	};
-	let Ok(hour) = hour_str.parse()
+	let Ok(hour) = hour_str.parse::<u8>()
 	else {
 		return Err(String::from("Failed to convert '{hour_str}' to a u8"));
 	};
 	// Minute
-	let Some(minute_str) = split.next()
-	else {
-		return Err(String::from("Failed to get minute"));
-	};
+	let minute_str = split.next().unwrap_or("00");
 	let Ok(minute) = minute_str.parse()
 	else {
 		return Err(String::from("Failed to convert '{minute_str}' to a u8"));
 	};
 	// Second (0 if not provided)
-	let second_str = split.next().unwrap_or("0");
+	let second_str = split.next().unwrap_or("00");
 	let Ok(second) = second_str.parse()
 	else {
 		return Err(String::from("Failed to convert '{second_str}' to a u8"));
 	};
-	
-	Ok(toml::value::Time{ hour, minute, second, nanosecond: 0 })
+
+	Ok(toml::value::Time{ hour: hour + hour_modifier, minute, second, nanosecond: 0 })
 }
 

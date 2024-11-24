@@ -12,6 +12,7 @@ use engine::files;
 
 mod commands;
 use commands::time;
+use commands::money;
 
 // TODO: Make this macro also build us a bash completions tree!
 //       And make it crawl the called functions!
@@ -49,13 +50,6 @@ macro_rules! MatchCompletions {
         	}
         }
     };
-}
-
-mod money {
-	pub fn main(args: &mut Vec<String>)
-	{
-		println!("{}", args[1]);
-	}
 }
 
 // Run with cargo run --bin ledgerr -- ARGS

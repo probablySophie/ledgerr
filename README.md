@@ -21,7 +21,7 @@ Running the binary will no arguments (or an invalid argument) will provide a lis
 ## Steps to completion:
 
 - [ ] `ledgerr:timesheet:Entry` filtering by `before:`, `after:`
-- [ ] New timesheet entries should default to today's date
+- [x] New timesheet entries should default to today's date
 - [ ] Entry.sort()
 - [ ] Multi day entries (probably just break into multiple at midnight)
 - [ ] Finance.  All of it.
@@ -32,6 +32,11 @@ Running the binary will no arguments (or an invalid argument) will provide a lis
 - [ ] Cute little table print so that everything gets the same spacing no matter the lengths.
 - [ ] Build a bash completion function for `ledgerr_cmd`
 - [ ] Parallelise the `&[Entry]` and `&[Transaction]` filter & analysis functions
+
+### Future Niceties for a Future App
+
+* The ability to edit new entries after making them, but before saving them
+* The ability to view **& edit** saved entries
 
 ## Storage Formats
 
