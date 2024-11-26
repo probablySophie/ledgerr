@@ -64,3 +64,43 @@ pub fn client_total()
 		}
 	});
 }
+
+
+pub fn list(args: &mut Vec<String>)
+{
+	args.remove(0); // Remove the "list" from the args
+	crate::MatchCompletions!{
+		args.first(),
+		"projects", list_projects(), "List all projects",
+		"clients", list_clients(), "List all clients"
+	};
+}
+
+fn list_projects()
+{
+	load_match!(timesheet, {
+		let client_project_pairs = ledgerr::timesheet::get_clients_and_projects(&timesheet);
+		let mut last_client = String::new();
+		for pair in client_project_pairs
+		{
+			if pair.0 != last_client
+			{
+				println!("Client: {}", pair.0.bold());
+				last_client = pair.0;
+			}
+			println!("\t* {}", pair.1);
+		}
+	});
+}
+
+fn list_clients()
+{
+	load_match!(timesheet, {
+		let clients = ledgerr::timesheet::get_clients(&timesheet);
+		println!("Clients:");
+		for client in clients
+		{
+			println!("* {client}");
+		}
+	});
+}

@@ -1,3 +1,4 @@
+#[path = "../tests/toml_string_test.rs"] mod test;
 
 fn split_please<'a>(string: &'a str, options: &[&'a str]) -> core::str::Split<'a, &'a str>
 {

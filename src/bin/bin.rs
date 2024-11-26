@@ -16,6 +16,7 @@ use commands::money;
 
 // TODO: Make this macro also build us a bash completions tree!
 //       And make it crawl the called functions!
+// TODO: Export this to its own crate?
 #[macro_export]
 /// Handles matches and calls for an `Option<String>`
 /// Expects the Option<Slice> and then repeating:
