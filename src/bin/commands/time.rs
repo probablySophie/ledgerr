@@ -15,7 +15,7 @@ pub fn go(args: &mut Vec<String>)
 	crate::MatchCompletions!{
 		args.first(),
 		"new", new(), "Add a brand new time log",
-		"add", add(), "Add a new time log to an existing client & project",
+		"add", add(args), "Add a new time log to an existing client & project",
 		"view", time_view::view(args), "View the current time logs",
 		"list", time_view::list(args), "List the given item from the logs"
 	};
@@ -42,8 +42,14 @@ fn new()
 	}
 }
 
-fn add()
+fn add(args: &mut Vec<String>)
 {
+	args.remove(0); // Remove the "add"
+	// TODO: If there are more args:
+	// 			Try use the 1st one for an existing client
+	//          Try use the 2nd one for an existing project
+	//          If failed - continue as normal
+	
 	let logs = match load()
 	{
 		Ok(entries) => entries,
